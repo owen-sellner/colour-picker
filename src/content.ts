@@ -49,18 +49,27 @@ function rgbToHex(r: number, g: number, b: number): string {
 }
 
 let lastMove = 0;
-const throttleDelay = 16;
+const throttleDelay = 40;
+const colorCache = new Map<string, string>();
 
 const extractColourFromScreen = async (x: number, y: number): Promise<string> => {
+  const key = `${x},${y}`;
+  if (colorCache.has(key)) {
+    return colorCache.get(key)!; // Return cached color if available
+  }
+
   const screenshot = await html2canvas(document.body, {
     x: x + 2, 
     y: y + 6,
-    width: 5, 
-    height: 5
+    width: 6, 
+    height: 6,
+    useCORS: true
   });
   const pixelData = screenshot.getContext('2d')!.getImageData(1, 1, 1, 1).data; 
   const [r, g, b] = pixelData;
-  return rgbToHex(r, g, b);
+  const colour = rgbToHex(r, g, b);
+  colorCache.set(key, colour);
+  return colour;
 };
 
 document.addEventListener("mousemove", async (e: MouseEvent) => {
