@@ -19,6 +19,26 @@ Object.assign(followerDiv.style, {
 
 document.body.appendChild(followerDiv);
 
+const screenLayerDiv: HTMLDivElement = document.createElement("div");
+screenLayerDiv.style.zIndex = "99999";
+screenLayerDiv.style.pointerEvents = "none";
+
+Object.assign(screenLayerDiv.style, {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  padding: "10vw",
+  border: "1px solid red",
+  width: "100vw",
+  height: "100vh",
+  pointerEvents: "auto",
+  zIndex: "99999",
+  cursor: "crosshair",
+});
+
+document.body.appendChild(screenLayerDiv);
+
+
 // Helper function
 function rgbToHex(r: number, g: number, b: number): string {
   const toHex = (value: number) => {
@@ -33,10 +53,10 @@ const throttleDelay = 16;
 
 const extractColourFromScreen = async (x: number, y: number): Promise<string> => {
   const screenshot = await html2canvas(document.body, {
-    x: x - 1, 
-    y: y - 1,
-    width: 20, 
-    height: 20
+    x: x + 2, 
+    y: y + 6,
+    width: 5, 
+    height: 5
   });
   const pixelData = screenshot.getContext('2d')!.getImageData(1, 1, 1, 1).data; 
   const [r, g, b] = pixelData;
@@ -56,6 +76,11 @@ document.addEventListener("mousemove", async (e: MouseEvent) => {
       followerDiv.style.backgroundColor = color;
     } 
   }
+});
+
+screenLayerDiv.addEventListener("click", (e: MouseEvent) => {
+  e.stopImmediatePropagation();
+  e.preventDefault();
 });
 
 // Hide the follower when the user scrolls
