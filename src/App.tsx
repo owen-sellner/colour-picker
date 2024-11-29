@@ -1,4 +1,5 @@
 import './App.css';
+import React from 'react';
 import copyIcon from '../public/copy.svg';
 
 interface CopyIconButtonProps {
@@ -13,7 +14,6 @@ const CopyIconButton: React.FC<CopyIconButtonProps> = ({ code }) => {
   );
 };
 
-
 function App() {
   const HEX_CODE = "#FFFFFF";
   const RGB_CODE = "255,255,255";
@@ -21,7 +21,7 @@ function App() {
 
   return (
     <>
-      <div className='colour-display'> </div>
+      <div className='colour-display' style={{ background: HEX_CODE }}> </div>
       <div className='flex-row'>
         <p>HEX</p>
         <p>{HEX_CODE}</p>

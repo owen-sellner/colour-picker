@@ -3,6 +3,12 @@
     "name": "Colour Picker",
     "version": "1.0.0",
     "description": "Picks colours from the screen.",
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ],
     "action": {
         "default_popup": "index.html"
     },

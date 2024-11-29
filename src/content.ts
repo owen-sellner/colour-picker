@@ -1,35 +1,70 @@
-import html2canvas from "html2canvas";
 
-let canvas: HTMLCanvasElement;
-let ctx: CanvasRenderingContext2D | null;
+// Create the follower div and style it
+const followerDiv: HTMLDivElement = document.createElement("div");
+followerDiv.id = "cursor-follower";
 
-document.addEventListener("mousemove", (event) => {
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-    ctx = canvas.getContext("2d");
+// function rgbToHex(r: any, g: any, b: any): string {
+//   const toHex = (value: number) => {
+//     const hex = value.toString(16); 
+//     return hex.length === 1 ? '0' + hex : hex; 
+//   };
+//   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+// }
+
+Object.assign(followerDiv.style, {
+  position: "absolute",
+  width: "20px",
+  height: "20px",
+  backgroundColor: "green", 
+  pointerEvents: "none",
+  zIndex: "9999",
+  transform: "translate(100%, -100%)",
+  transition: "transform 0.1s ease-out",
+  border: "2px solid black",
+  opacity: "1"
+});
+
+document.body.appendChild(followerDiv);
+
+let lastMove = 0;
+const throttleDelay = 16;
+
+const extractColourFromStyles = (element: HTMLElement): string | null => {
+  const style = window.getComputedStyle(element);
+  const backgroundColor = style.backgroundColor; 
+
+  if (backgroundColor) {
+    return backgroundColor;
+  } 
+  return null; 
+};
+
+document.addEventListener("mousemove", (e: MouseEvent) => {
+  const now = Date.now();
+
+  if (now - lastMove > throttleDelay) {
+    followerDiv.style.left = `${e.pageX}px`;
+    followerDiv.style.top = `${e.pageY}px`;
+    lastMove = now;
+
+    const element = document.elementFromPoint(e.pageX, e.pageY);
+    if (element) {
+      const styleColor = extractColourFromStyles(element as HTMLElement);
+      if (styleColor && styleColor.toLowerCase() !== 'transparent') {
+        followerDiv.style.backgroundColor = styleColor;
+      } 
+    }
   }
+});
 
-  const { clientX, clientY } = event;
-  const element = document.elementFromPoint(clientX, clientY) as HTMLElement;
+// Hide the follower when the user scrolls
+document.addEventListener("scroll", () => {
+  followerDiv.style.opacity = "0";
+});
 
-  if (element) {
-    const rect = element.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-
-    html2canvas(element).then((canvasElement) => {
-      const elementImage = canvasElement;
-
-      ctx?.clearRect(0, 0, canvas.width, canvas.height); 
-      ctx?.drawImage(elementImage, 0, 0, rect.width, rect.height);
-
-      const pixelData = ctx?.getImageData(x, y, 1, 1).data;
-      if (pixelData) {
-        const [r, g, b] = pixelData;
-        const color = `rgb(${r},${g},${b})`;
-
-        chrome.runtime.sendMessage({ action: "updateColor", color });
-      }
-    });
+// Show the follower again when the mouse moves
+document.addEventListener("mousemove", () => {
+  if (followerDiv.style.opacity === "0") {
+    followerDiv.style.opacity = "1";
   }
 });

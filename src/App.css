@@ -7,11 +7,9 @@
 .colour-display {
   margin:  0 auto 1rem auto;
   padding: 10px;
-  color: #FFF;
   background: #FFF;
   width: 60vw;
   height: 25vw;
-  border: 4px solid #000;
   border-radius: 16px;
 }
 
