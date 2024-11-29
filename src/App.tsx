@@ -1,34 +1,42 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
+import copyIcon from '../public/copy.svg';
+
+interface CopyIconButtonProps {
+  code: string;
+}
+
+const CopyIconButton: React.FC<CopyIconButtonProps> = ({ code }) => {
+  return (
+    <button onClick={() => navigator.clipboard.writeText(code)}>
+      <img src={copyIcon} alt="Copy" />
+    </button>
+  );
+};
+
 
 function App() {
-  // const [count, setCount] = useState(0)
+  const HEX_CODE = "#FFFFFF";
+  const RGB_CODE = "255,255,255";
+  const HSL_CODE = "100,100%,100%";
 
   return (
     <>
-      {/* <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div> */}
-      <h1>Colour Picker</h1>
-      <div className='aaa'> </div>
-      {/* <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div> */}
-      {/* <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p> */}
+      <div className='colour-display'> </div>
+      <div className='flex-row'>
+        <p>HEX</p>
+        <p>{HEX_CODE}</p>
+        <CopyIconButton code={HEX_CODE} />
+      </div>
+      <div className='flex-row'>
+        <p>RGB</p>
+        <p>{RGB_CODE}</p>
+        <CopyIconButton code={RGB_CODE} />
+      </div>
+      <div className='flex-row'>
+        <p>HSL</p>
+        <p>{HSL_CODE}</p>
+        <CopyIconButton code={HSL_CODE} />
+      </div>
     </>
   )
 }
