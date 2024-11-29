@@ -2,12 +2,13 @@
     "manifest_version": 3,
     "name": "Colour Picker",
     "version": "1.0.0",
+    "permissions": ["activeTab", "tabs", "storage"],
     "description": "Picks colours from the screen.",
     "content_scripts": [
-      {
+        {
         "matches": ["<all_urls>"],
         "js": ["content.js"]
-      }
+        }
     ],
     "action": {
       "default_popup": "index.html"
@@ -26,6 +27,7 @@
         "'self'",
         "'wasm-unsafe-eval'",
         "'inline-speculation-rules'",
+        "https://cdn.jsdelivr.net",
         "http://localhost:*",
         "http://127.0.0.1:*",
         "https://cdn.discourse-prod.itsre-apps.mozit.cloud"

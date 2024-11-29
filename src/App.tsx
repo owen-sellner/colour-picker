@@ -19,6 +19,8 @@ function App() {
   const RGB_CODE = "255,255,255";
   const HSL_CODE = "100,100%,100%";
 
+  chrome.storage.local.set({ isMenuOpen: true });
+
   return (
     <>
       <div className='colour-display' style={{ background: HEX_CODE }}> </div>
