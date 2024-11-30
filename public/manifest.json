@@ -27,7 +27,7 @@
         "'self'",
         "'wasm-unsafe-eval'",
         "'inline-speculation-rules'",
-        "https://cdn.jsdelivr.net",
+        "https://*",
         "http://localhost:*",
         "http://127.0.0.1:*",
         "https://cdn.discourse-prod.itsre-apps.mozit.cloud"

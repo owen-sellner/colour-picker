@@ -1,100 +1,133 @@
 import html2canvas from "html2canvas";
 
-// Helper function
 function rgbToHex(r: number, g: number, b: number): string {
-  const toHex = (value: number) => {
-    const hex = value.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  };
+  const toHex = (value: number): string => value.toString(16).padStart(2, "0");
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-let lastMove = 0;
-const extractColourFromScreen = async (
-  x: number,
-  y: number
-): Promise<string> => {
-  const screenshot = await html2canvas(document.body, {
-    x: x + 2,
-    y: y + 6,
-    width: 6,
-    height: 6,
-    useCORS: true,
+const extractColourFromScreen = async (x: number, y: number): Promise<string> => {
+  const scale = window.devicePixelRatio;
+  const canvas = document.createElement("canvas");
+  const canvasContext = canvas.getContext("2d")!;
+
+  canvas.width = Math.round(window.innerWidth * scale);
+  canvas.height = Math.round(window.innerHeight * scale);
+  canvasContext.scale(scale, scale); 
+
+  try {
+    const image = new Image();
+    image.src = (await html2canvas(document.body)).toDataURL();
+
+    return new Promise((resolve) => {
+      image.onload = () => {
+        canvasContext.drawImage(image, 0, 0);
+
+        const xIndex = Math.round(x * scale);
+        const yIndex = Math.round(y * scale);
+
+        if (
+          xIndex >= 0 &&
+          xIndex < canvas.width &&
+          yIndex >= 0 &&
+          yIndex < canvas.height
+        ) {
+          const canvasData = canvasContext.getImageData(0, 0, canvas.width, canvas.height).data;
+          const redIndex = yIndex * canvas.width * 4 + xIndex * 4;
+
+          const color = {
+            r: canvasData[redIndex],
+            g: canvasData[redIndex + 1],
+            b: canvasData[redIndex + 2],
+          };
+
+          resolve(rgbToHex(color.r, color.g, color.b));
+        } else {
+          resolve("#000000");
+        }
+      };
+      image.onerror = () => {
+        console.log("Error loading image:", image.src);
+        resolve("#000000"); 
+      };
+    });
+  } catch (error) {
+    console.log("Error capturing screen color:", error);
+    return "#000000"; 
+  }
+}
+
+const createCursorFollower = (): HTMLDivElement => {
+  const follower = document.createElement("div");
+  Object.assign(follower.style, {
+    position: "absolute",
+    width: "20px",
+    height: "20px",
+    backgroundColor: "green",
+    pointerEvents: "none",
+    zIndex: "9999",
+    transform: "translate(100%, -100%)",
+    transition: "transform 0.1s ease-out",
+    border: "2px solid black",
+    opacity: "1",
   });
-  const context = screenshot.getContext("2d", { willReadFrequently: true });
-  if (!context) return "#000000";
-  const pixelData = context.getImageData(1, 1, 1, 1).data;
-  const [r, g, b] = pixelData;
-  const colour = rgbToHex(r, g, b);
-  return colour;
+  follower.id = "cursor-follower";
+  document.body.appendChild(follower);
+  return follower;
 };
 
-const followerDiv: HTMLDivElement = document.createElement("div");
-followerDiv.id = "cursor-follower";
+const createScreenLayer = (): HTMLDivElement => {
+  const layer = document.createElement("div");
+  Object.assign(layer.style, {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    padding: "10vw",
+    width: "100vw",
+    height: "100vh",
+    pointerEvents: "auto",
+    zIndex: "99999",
+    cursor: "crosshair",
+  });
+  layer.id = "screen-layer";
+  document.body.appendChild(layer);
+  return layer;
+};
 
-Object.assign(followerDiv.style, {
-  position: "absolute",
-  width: "20px",
-  height: "20px",
-  backgroundColor: "green",
-  pointerEvents: "none",
-  zIndex: "9999",
-  transform: "translate(100%, -100%)",
-  transition: "transform 0.1s ease-out",
-  border: "2px solid black",
-  opacity: "1",
-});
+const cursorFollower = createCursorFollower();
+const screenLayer = createScreenLayer();
 
-document.body.appendChild(followerDiv);
+let lastMoveTimestamp = 0;
 
-const screenLayerDiv: HTMLDivElement = document.createElement("div");
-screenLayerDiv.id = "screen-layer";
+document.addEventListener("mousemove", async (event: MouseEvent) => {
+  const currentTimestamp = Date.now();
 
-Object.assign(screenLayerDiv.style, {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  padding: "10vw",
-  width: "100vw",
-  height: "100vh",
-  pointerEvents: "auto",
-  zIndex: "99999",
-  cursor: "crosshair",
-});
+  if (currentTimestamp - lastMoveTimestamp > 16) {
+    cursorFollower.style.left = `${event.pageX}px`;
+    cursorFollower.style.top = `${event.pageY}px`;
+    lastMoveTimestamp = currentTimestamp;
 
-document.body.appendChild(screenLayerDiv);
-
-document.addEventListener("mousemove", async (e: MouseEvent) => {
-  const now = Date.now();
-
-  if (now - lastMove > 16) {
-    followerDiv.style.left = `${e.pageX}px`;
-    followerDiv.style.top = `${e.pageY}px`;
-    lastMove = now;
-
-    const color = await extractColourFromScreen(e.pageX, e.pageY);
-    if (color && color.toLowerCase() !== "transparent") {
-      followerDiv.style.backgroundColor = color;
+    const color = await extractColourFromScreen(event.pageX, event.pageY);
+    if (color.toLowerCase() !== "transparent") {
+      cursorFollower.style.backgroundColor = color;
     }
   }
 });
 
-screenLayerDiv.addEventListener("click", async (e: MouseEvent) => {
-  e.stopImmediatePropagation();
-  e.preventDefault();
+screenLayer.addEventListener("click", async (event: MouseEvent) => {
+  event.stopImmediatePropagation();
+  event.preventDefault();
 
-  const colourHex = await extractColourFromScreen(e.pageX, e.pageY);
+  const colourHex = await extractColourFromScreen(event.pageX, event.pageY);
   chrome.storage.local.set({ colour: colourHex });
 });
 
-// Hide the follower when the user scrolls
+// Hide and show cursor follower on scroll and mousemove
 document.addEventListener("scroll", () => {
-  followerDiv.style.opacity = "0";
+  cursorFollower.style.opacity = "0";
 });
 
-// Show the follower again when the mouse moves
 document.addEventListener("mousemove", () => {
-  if (followerDiv.style.opacity === "0") {
-    followerDiv.style.opacity = "1";
+  if (cursorFollower.style.opacity === "0") {
+    cursorFollower.style.opacity = "1";
   }
 });
