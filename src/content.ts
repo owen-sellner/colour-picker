@@ -10,14 +10,7 @@ function rgbToHex(r: number, g: number, b: number): string {
 }
 
 let lastMove = 0;
-const colorCache = new Map<string, string>();
-
 const extractColourFromScreen = async (x: number, y: number): Promise<string> => {
-  const key = `${x},${y}`;
-  if (colorCache.has(key)) {
-    return colorCache.get(key)!; 
-  }
-
   const screenshot = await html2canvas(document.body, {
     x: x + 2, 
     y: y + 6,
@@ -25,13 +18,12 @@ const extractColourFromScreen = async (x: number, y: number): Promise<string> =>
     height: 6,
     useCORS: true 
   });
-  const context = screenshot.getContext('2d');
+  const context = screenshot.getContext('2d', { willReadFrequently: true });
   if (!context) 
       return "#000000";
-  const pixelData = screenshot.getContext('2d')!.getImageData(1, 1, 1, 1).data; 
+  const pixelData = context.getImageData(1, 1, 1, 1).data; 
   const [r, g, b] = pixelData;
   const colour = rgbToHex(r, g, b);
-  colorCache.set(key, colour);
   return colour;
 };
 
@@ -66,7 +58,6 @@ if(storage.isMenuOpen === true) {
       top: 0,
       left: 0,
       padding: "10vw",
-      border: "1px solid red",
       width: "100vw",
       height: "100vh",
       pointerEvents: "auto",
@@ -91,9 +82,12 @@ if(storage.isMenuOpen === true) {
     }
   });
 
-  screenLayerDiv.addEventListener("click", (e: MouseEvent) => {
+  screenLayerDiv.addEventListener("click", async (e: MouseEvent) => {
     e.stopImmediatePropagation();
     e.preventDefault();
+
+    const colourHex = await extractColourFromScreen(e.pageX, e.pageY);
+    chrome.storage.local.set({ colour: colourHex });
   });
   
   // Hide the follower when the user scrolls

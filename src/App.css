@@ -5,12 +5,12 @@
 }
 
 .colour-display {
-  margin:  0 auto 1rem auto;
+  margin:  0.5rem auto 1rem auto;
   padding: 10px;
   background: #FFF;
-  width: 60vw;
-  height: 25vw;
-  border-radius: 16px;
+  width: 70vw;
+  height: 5vw;
+  border-radius: 8px;
 }
 
 p {
