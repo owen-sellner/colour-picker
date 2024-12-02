@@ -14,6 +14,32 @@
   border: 4px solid white;
 }
 
+.select-btn {
+  margin: auto 0;
+  padding: 5px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.87);
+  color: #242424;
+}
+
+.select-btn:hover {
+  background: rgba(255, 255, 255, 0.67);
+}
+
+.select-btn:active {
+  background: rgba(255, 255, 255, 0.47);
+}
+
+.centered-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  alight-content: center;
+  padding: 10px;
+}
+
 p {
   font-size: 0.75rem;
   margin: 0.5rem 0;

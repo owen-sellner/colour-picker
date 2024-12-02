@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Colour Picker",
     "version": "1.0.0",
-    "permissions": ["activeTab", "tabs", "storage"],
+    "permissions": ["activeTab", "tabs", "storage", "<all_urls>"],
     "description": "Picks colours from the screen.",
     "content_scripts": [
         {
@@ -13,6 +13,12 @@
     "action": {
       "default_popup": "index.html"
     },
+    "web_accessible_resources": [
+    {
+      "resources": ["html2canvas.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
     "host_permissions": [
       "http://*/*",
       "https://*/*"

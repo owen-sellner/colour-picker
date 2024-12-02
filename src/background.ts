@@ -3,12 +3,3 @@ chrome.runtime.onMessage.addListener((message) => {
     chrome.storage.local.set({ colour: message.colour });
   }
 });
-
-chrome.webNavigation.onCompleted.addListener((details) => {
-  if (details.tabId !== undefined) {
-    chrome.scripting.executeScript({
-      target: { tabId: details.tabId },
-      files: ["content.js"],
-    });
-  }
-});

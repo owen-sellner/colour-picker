@@ -52,6 +52,12 @@ function App() {
     };
   }, []);
 
+  const handleSelectClick = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id!, { action: 'toggle' });
+    });
+  };
+
   return (
     <>
       <div
@@ -79,6 +85,9 @@ function App() {
         <CopyIconButton
           text={new TinyColor(colour).toHslString().replace(/^hsl\(|\)$/g, "")}
         />
+      </div>
+      <div className="centered-row">
+        <button onClick={handleSelectClick} className="select-btn">Select Colour</button>
       </div>
     </>
   );
