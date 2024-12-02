@@ -147,6 +147,10 @@ function initializeContentScript() {
 
     const colourHex = await extractColourFromScreen(event.pageX, event.pageY);
     chrome.storage.local.set({ colour: colourHex });
+
+    isContentScriptEnabled = false;
+    chrome.storage.local.set({ contentScriptEnabled: false });
+    removeContentScript();
   });
 
   // Hide and show cursor follower on scroll and mousemove
