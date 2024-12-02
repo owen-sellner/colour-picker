@@ -14,6 +14,14 @@ chrome.runtime.onMessage.addListener(function(req) {
   }
 });
 
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    isContentScriptEnabled = false;
+    chrome.storage.local.set({ contentScriptEnabled: false });
+    removeContentScript();
+  }
+});
+
 chrome.storage.local.get(['contentScriptEnabled'], (result) => {
   isContentScriptEnabled = result.contentScriptEnabled || false;
   if (isContentScriptEnabled) initializeContentScript();
