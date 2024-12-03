@@ -134,9 +134,28 @@ function removeContentScript(): void {
   if (screenLayer) screenLayer.remove();
 }
 
+async function loadAllImages(): Promise<void> {
+  const images = Array.from(document.getElementsByTagName('img'));
+
+  const imagePromises = images.map(img => {
+    return new Promise<void>((resolve, reject) => {
+      if (img.complete) {
+        resolve();
+      } else {
+        img.onerror = reject;
+      }
+    });
+  });
+  await Promise.all(imagePromises);
+}
+
 async function initializeScreenshot(): Promise<void> {
   if (!cachedScreenshot) {
-    const canvas = await html2canvas(document.body);
+    await loadAllImages();
+    const canvas = await html2canvas(document.body, {
+      useCORS: true,  
+      allowTaint: true,  
+    });
     cachedScreenshot = canvas.getContext("2d", { willReadFrequently: true });
   }
 }

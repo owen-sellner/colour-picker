@@ -56,10 +56,22 @@ function App() {
     window.close();
   
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.tabs.update(tabs[0].id!, { active: true });
-      chrome.tabs.sendMessage(tabs[0].id!, { action: 'toggle' });
+      const currentTabId = tabs[0]?.id;
+      if (currentTabId === undefined) return;
+  
+      chrome.tabs.update(currentTabId, { active: true });
+      chrome.tabs.sendMessage(
+        currentTabId,
+        { action: "toggle" },
+        function () {
+          if (chrome.runtime.lastError) {
+            alert("Colour Picker was denied access to this webpage.");
+          }
+        }
+      );
     });
   };
+  
 
   return (
     <>
