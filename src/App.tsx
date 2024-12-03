@@ -53,7 +53,10 @@ function App() {
   }, []);
 
   const handleSelectClick = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    window.close();
+  
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.update(tabs[0].id!, { active: true });
       chrome.tabs.sendMessage(tabs[0].id!, { action: 'toggle' });
     });
   };
