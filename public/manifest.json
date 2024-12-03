@@ -29,6 +29,6 @@
     "128": "icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self';"
+    "extension_pages": "default-src 'self'; object-src 'self'; script-src 'self' 'wasm-unsafe-eval';"
   }
 }

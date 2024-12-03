@@ -1,6 +1,6 @@
 import "./App.css";
 import React, { useEffect, useState } from "react";
-import copyIcon from "../public/copy.svg";
+import copyIcon from "/copy.svg";
 import { TinyColor } from "@ctrl/tinycolor";
 
 interface CopyIconButtonProps {
