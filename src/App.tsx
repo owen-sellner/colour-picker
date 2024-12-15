@@ -79,7 +79,7 @@ function App() {
         className="colour-display"
         style={{
           background: colour,
-          borderColor: new TinyColor(colour).isDark() ? "#FFFFFF" : "transparent",
+          borderColor: new TinyColor(colour).getLuminance() < 0.05 ? "#FFFFFF" : "transparent",
         }}
       />
       <div className="flex-row">
